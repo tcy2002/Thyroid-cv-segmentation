@@ -12,7 +12,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
 
-        self.width = 1440
+        self.width = 1500
         self.height = 840
 
         self.setWindowTitle("甲状腺前景分割")
@@ -89,7 +89,7 @@ class MainWindow(QMainWindow):
 
         # 左侧文件列表：上方为原图片，下方为处理后的图片
         self.list_widget = QWidget()
-        self.list_widget.setMinimumWidth(160)
+        self.list_widget.setMinimumWidth(200)
         self.list_layout = QVBoxLayout()
         self.list_widget.setLayout(self.list_layout)
         self.file_list_widget = QListWidget()
@@ -257,7 +257,7 @@ class MainWindow(QMainWindow):
         self.output_list_widget.clear()
         self.image_label.clear()
         self.img_selected = ""
-        self.out_dirname = ""
+        self.out_dirname = "./outputs"
         self.seeds = []
         self.processing = False
 
@@ -268,13 +268,19 @@ class MainWindow(QMainWindow):
         print("开始分割计算：", self.img_selected)
         self.processing = False
         self.image_label.setCursor(Qt.ArrowCursor)
-        out_path = os.path.join(self.out_dirname, os.path.basename(self.img_selected))
+        name = os.path.basename(self.img_selected)
 
         if self.method == 'growth':
+            name = "growth_" + name
+            out_path = os.path.join(self.out_dirname, name)
             self.growth.grow(self.seeds, self.img_selected, out_path)
         elif self.method == 'watershed':
+            name = "watershed_" + name
+            out_path = os.path.join(self.out_dirname, name)
             self.watershed.segmentation(self.seeds, self.img_selected, out_path)
         elif self.method == 'unet':
+            name = "unet_" + name
+            out_path = os.path.join(self.out_dirname, name)
             self.unet.predict(self.img_selected, out_path)
         else:
             return
@@ -308,6 +314,3 @@ if __name__ == '__main__':
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())
-
-    # 写一句用pyinstaller把这个项目打包成可执行程序的cmd指令
-
