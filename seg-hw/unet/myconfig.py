@@ -2,13 +2,15 @@
 此文件用于配置模型的参数
 """
 
+import torch
+
 MODEL_PATH = r'./model'
 IMG_PATH_NAME = 'images'
 LABEL_PATH_NAME = 'labels'
 
 IMG_SIZE = (256, 192)
 
-DEVICE = 'cuda:0 if torch.cuda.is_available() else cpu'
+DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 EPOCHS = 30
 BATCH_SIZE = 1
 

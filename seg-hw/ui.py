@@ -22,6 +22,7 @@ class MainWindow(QMainWindow):
         self.out_dirname = "./outputs"
         self.processing = False
         self.seeds = []
+        self.seeds_bg = []
         self.method = "growth"
 
         self.growth = Growth()
@@ -183,13 +184,15 @@ class MainWindow(QMainWindow):
         """
         if self.img_selected == "" or not self.processing:
             return
+
+        button = event.button()
+        if button != Qt.LeftButton and button != Qt.RightButton:
+            return
+
         img = self.image_label.pixmap().toImage()
         pos = event.pos()
         if pos.x() < 0 or pos.y() < 0 or pos.x() >= img.width() or pos.y() >= img.height():
             return
-
-        print("点击位置：", pos.x(), pos.y())
-        self.seeds.append((pos.x(), pos.y()))
 
         # 在展示窗中绘制点
         painter = QPainter()
@@ -199,12 +202,19 @@ class MainWindow(QMainWindow):
         painter.end()
         self.image_label.setPixmap(QPixmap.fromImage(img))
 
+        print("点击位置：", pos.x(), pos.y(), button)
+        # 若为左键点击，则添加种子点，否则添加背景点
+        if button == Qt.LeftButton:
+            self.seeds.append((pos.x(), pos.y()))
+        else:
+            self.seeds_bg.append((pos.x(), pos.y()))
+
     def slot_button1_clicked(self):
         """
         点击事件：标记种子点
         """
         if self.img_selected == "":
-            QMessageBox.information(self, "提示", "请先选择图片", QMessageBox.Yes)
+            QMessageBox.information(self, "提示", "请先选择图片", QMessageBox.Ok)
             return
 
         print("开始选择种子点")
@@ -216,13 +226,13 @@ class MainWindow(QMainWindow):
         点击事件：开始分割
         """
         if self.img_selected == "":
-            QMessageBox.information(self, "提示", "请先选择图片", QMessageBox.Yes)
+            QMessageBox.information(self, "提示", "请先选择图片", QMessageBox.Ok)
             return
         if self.method != 'unet' and len(self.seeds) == 0:
-            QMessageBox.information(self, "提示", "请先标记种子点", QMessageBox.Yes)
+            QMessageBox.information(self, "提示", "请先标记种子点", QMessageBox.Ok)
             return
         if self.out_dirname == "":
-            QMessageBox.information(self, "提示", "请先选择保存路径", QMessageBox.Yes)
+            QMessageBox.information(self, "提示", "请先选择保存路径", QMessageBox.Ok)
             return
 
         self.seg_processing()
@@ -232,17 +242,17 @@ class MainWindow(QMainWindow):
         点击事件：批量分割
         """
         if self.file_list_widget.count() == 0:
-            QMessageBox.information(self, "提示", "请先导入图片", QMessageBox.Yes)
+            QMessageBox.information(self, "提示", "请先导入图片", QMessageBox.Ok)
             return
         if self.method != 'unet':
-            ans = QMessageBox.warning(self, "警告", "当前种子点将应用到所有分割，是否继续", QMessageBox.Yes, QMessageBox.No)
+            ans = QMessageBox.warning(self, "警告", "当前种子点将应用到所有分割，是否继续", QMessageBox.Ok, QMessageBox.No)
             if ans == QMessageBox.No:
                 return
             if len(self.seeds) == 0:
-                QMessageBox.information(self, "提示", "请先标记种子点", QMessageBox.Yes)
+                QMessageBox.information(self, "提示", "请先标记种子点", QMessageBox.Ok)
                 return
         if self.out_dirname == "":
-            QMessageBox.information(self, "提示", "请先选择保存路径", QMessageBox.Yes)
+            QMessageBox.information(self, "提示", "请先选择保存路径", QMessageBox.Ok)
             return
 
         for i in range(self.file_list_widget.count()):
@@ -273,11 +283,12 @@ class MainWindow(QMainWindow):
         if self.method == 'growth':
             name = "growth_" + name
             out_path = os.path.join(self.out_dirname, name)
+            self.seeds.extend(self.seeds_bg)
             self.growth.grow(self.seeds, self.img_selected, out_path)
         elif self.method == 'watershed':
             name = "watershed_" + name
             out_path = os.path.join(self.out_dirname, name)
-            self.watershed.segmentation(self.seeds, self.img_selected, out_path)
+            self.watershed.segmentation(self.seeds, self.seeds_bg, self.img_selected, out_path)
         elif self.method == 'unet':
             name = "unet_" + name
             out_path = os.path.join(self.out_dirname, name)
@@ -290,6 +301,8 @@ class MainWindow(QMainWindow):
         self.image_label.setPixmap(QPixmap(out_path))
         self.img_selected = ""
         self.seeds.clear()
+        self.seeds_bg.clear()
+        print("分割计算结束：", out_path)
 
     def slot_help(self):
         QMessageBox.information(self, "操作说明", "主菜单说明：\n"
@@ -306,7 +319,7 @@ class MainWindow(QMainWindow):
                                               "\n"
                                               "关于种子点标记：\n"
                                               "9.区域增长：允许标记多个种子点，所有种子点均为前景区域\n"
-                                              "10.分水岭：允许标记多个种子点，有且仅有第1个种子点为前景区域，其他种子点为背景区域\n", QMessageBox.Yes)
+                                              "10.分水岭：允许标记多个种子点，鼠标左键标注的种子点为前景点，鼠标右键标注的种子点为背景点。\n", QMessageBox.Ok)
 
 
 if __name__ == '__main__':

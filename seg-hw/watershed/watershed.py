@@ -25,22 +25,22 @@ class WatershedSegmenter:
         img = cv2.threshold(img, POST_THRESHOLD, 255, cv2.THRESH_BINARY)[1]
         return img
 
-    def _segment(self, img, seeds):
-        # 创建标记图像
+    def _segment(self, img, seeds_fg, seeds_bg):
         markers = np.zeros(img.shape[:2], dtype=np.int32)
 
-        # 设置标记点为不同的颜色
-        for i, seed in enumerate(seeds):
-            cv2.drawMarker(markers, tuple(seed), (i+1), cv2.MARKER_TILTED_CROSS)
-
+        for seed in seeds_fg:
+            cv2.drawMarker(markers, tuple(seed), 1, cv2.MARKER_TILTED_CROSS)
+        for seed in seeds_bg:
+            cv2.drawMarker(markers, tuple(seed), 2, cv2.MARKER_TILTED_CROSS)
         cv2.watershed(img, markers)
+
         return markers
 
-    def segmentation(self, seeds, img_path, out_path):
+    def segmentation(self, seeds_fg, seeds_bg, img_path, out_path):
         img = cv2.imread(img_path)
         blur = self._preprocess(img)
 
-        markers = self._segment(blur, seeds)
+        markers = self._segment(blur, seeds_fg, seeds_bg)
 
         # 将每个区域用不同的颜色显示在原始图像上
         segmentation = np.zeros_like(blur)
