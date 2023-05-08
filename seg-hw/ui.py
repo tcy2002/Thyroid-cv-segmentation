@@ -197,14 +197,17 @@ class MainWindow(QMainWindow):
         # 在展示窗中绘制点
         painter = QPainter()
         painter.begin(img)
-        painter.setPen(QPen(Qt.white, 5))
+        if self.method == 'growth' or button == Qt.LeftButton:
+            painter.setPen(QPen(Qt.white, 5))
+        else:
+            painter.setPen(QPen(Qt.yellow, 5))
         painter.drawPoint(pos)
         painter.end()
         self.image_label.setPixmap(QPixmap.fromImage(img))
 
         print("点击位置：", pos.x(), pos.y(), button)
         # 若为左键点击，则添加种子点，否则添加背景点
-        if button == Qt.LeftButton:
+        if self.method == 'growth' or button == Qt.LeftButton:
             self.seeds.append((pos.x(), pos.y()))
         else:
             self.seeds_bg.append((pos.x(), pos.y()))

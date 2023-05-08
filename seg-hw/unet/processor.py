@@ -148,5 +148,5 @@ class Processor:
         img = np.array(img)
         print(out_img.shape, img.shape)
         out_img = self._postprocess(out_img)
-        out_img = cv2.bitwise_and(img, out_img)
+        # out_img = cv2.bitwise_and(img, out_img)
         cv2.imwrite(out_path, out_img)

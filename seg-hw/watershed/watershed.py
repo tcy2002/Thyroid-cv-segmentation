@@ -32,8 +32,8 @@ class WatershedSegmenter:
             cv2.drawMarker(markers, tuple(seed), 1, cv2.MARKER_TILTED_CROSS)
         for seed in seeds_bg:
             cv2.drawMarker(markers, tuple(seed), 2, cv2.MARKER_TILTED_CROSS)
-        cv2.watershed(img, markers)
 
+        cv2.watershed(img, markers)
         return markers
 
     def segmentation(self, seeds_fg, seeds_bg, img_path, out_path):
@@ -48,5 +48,5 @@ class WatershedSegmenter:
         segmentation[markers == 2] = 0
 
         segmentation = self._postprocess(segmentation)
-        segmentation = cv2.bitwise_and(img, segmentation)
+        # segmentation = cv2.bitwise_and(img, segmentation)
         cv2.imwrite(out_path, segmentation)

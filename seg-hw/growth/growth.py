@@ -123,7 +123,7 @@ class Growth:
         img = self._region_growing(img, seeds)
 
         mask = self._postprocess(img)
-        img = cv2.bitwise_and(raw_img, mask)
+        # img = cv2.bitwise_and(raw_img, mask)
 
-        cv2.imwrite(out_path, img)
+        cv2.imwrite(out_path, mask)
 
