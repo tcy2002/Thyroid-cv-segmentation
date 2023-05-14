@@ -48,5 +48,5 @@ class WatershedSegmenter:
         segmentation[markers == 2] = 0
 
         segmentation = self._postprocess(segmentation)
-        # segmentation = cv2.bitwise_and(img, segmentation)
+        segmentation = cv2.bitwise_and(img, segmentation)
         cv2.imwrite(out_path, segmentation)
