@@ -81,11 +81,13 @@ class UniformityDetector:
         std_y = np.std(glcm_ys, axis=0)
         std = math.sqrt(np.mean(std_x) * np.mean(std_y))
 
-        # 分级：0-0.1：均匀；0.1-0.2：不均匀；0.2-0.3：非常不均匀
+        # 分级：0-0.8：均匀；0.08-0.16：较均匀；0.16-0.3：不均匀；0.3-：非常不均匀
         print(std)
-        if std < 0.1:
+        if std < 0.08:
             return '均匀'
-        elif std < 0.2:
+        elif std < 0.16:
+            return '较均匀'
+        elif std < 0.3:
             return '不均匀'
         else:
             return '非常不均匀'
