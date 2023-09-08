@@ -6,6 +6,6 @@
 
 ![UI说明](Screenshots/ui-tutorial.png)
 
-!video[demo](Screenshots/demo.mp4)
+![demo](Screenshots/demo.gif)
 
 
